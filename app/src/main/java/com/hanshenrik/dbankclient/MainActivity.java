@@ -1,5 +1,7 @@
 package com.hanshenrik.dbankclient;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -31,6 +33,7 @@ public class MainActivity extends ActionBarActivity {
     private ListView accountNumbersListView;
 
     private ArrayList<String> accountNumbers;
+    private double amount;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -67,14 +70,64 @@ public class MainActivity extends ActionBarActivity {
         accountNumbersListView = (ListView) findViewById(R.id.accountNumbersListView);
 
         ArrayAdapter accountNumbersListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, accountNumbers);
+        accountNumbersListView.setAdapter(accountNumbersListAdapter);
 
         getBalanceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 balanceText.setText("getting balance...");
+                // setup connection
                 // query balance
                 // on some callback
                 balanceText.setText(getString(R.string.currency_prefix) + "100.00");
+            }
+        });
+
+        depositButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                amount = Double.parseDouble(amountInput.getText().toString());
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Deposit?")
+                        .setMessage("Are you sure you want to deposit " + amount + " into account "
+                                + "?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // setup connection
+                                // do stuff
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
+
+        withdrawButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                amount = Double.parseDouble(amountInput.getText().toString());
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Withdraw?")
+                        .setMessage("Are you sure you want to withdraw " + amount + " from account "
+                                + "?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // setup connection
+                                // do stuff
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
             }
         });
     }
