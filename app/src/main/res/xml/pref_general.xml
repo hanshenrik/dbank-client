@@ -35,6 +35,7 @@
         android:key="@string/pref_key_account_numbers"
         android:title="@string/pref_title_account_numbers"
         android:defaultValue="-1"
+        android:summary="%s"
         android:entries="@array/pref_account_numbers_list_titles"
         android:entryValues="@array/pref_account_numbers_list_values"
         android:negativeButtonText="@null"
