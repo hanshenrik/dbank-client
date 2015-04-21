@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,7 +27,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -36,10 +39,9 @@ public class MainActivity extends ActionBarActivity {
     private static final int DEPOSIT_OPERATION = 1;
     private static final int WITHDRAW_OPERATION = 2;
     private static final int TRANSFER_OPERATION = 3;
+    public static final String ACCOUNT_NUMBERS_SET = "com.hanshenrik.dbankclient.account_numbers_list";
 
-    private Button getBalanceButton;
-    private Button withdrawButton;
-    private Button depositButton;
+    private Button getBalanceButton, withdrawButton, depositButton, addAccountButton;
     private TextView balanceText;
     private EditText amountInput;
     private ListView accountNumbersListView;
@@ -69,19 +71,21 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         accountNumbers = new ArrayList<>();
-        // DEV
-        accountNumbers.add("1234.56.78910");
-        accountNumbers.add("9876.54.32100");
-        accountNumbers.add("0000.00.00000");
+
+        // Retrieve account numbers
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        Set<String> accountNumbersSet = prefs.getStringSet(ACCOUNT_NUMBERS_SET, null);
+        accountNumbers.addAll(accountNumbersSet);
 
         getBalanceButton = (Button) findViewById(R.id.getBalanceButton);
         withdrawButton = (Button) findViewById(R.id.withdrawButton);
         depositButton = (Button) findViewById(R.id.depositButton);
+        addAccountButton = (Button) findViewById(R.id.addAccountButton);
         balanceText = (TextView) findViewById(R.id.balanceTextView);
         amountInput = (EditText) findViewById(R.id.amountInput);
         accountNumbersListView = (ListView) findViewById(R.id.accountNumbersListView);
 
-        ArrayAdapter accountNumbersListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, accountNumbers);
+        final ArrayAdapter accountNumbersListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, accountNumbers);
         accountNumbersListView.setAdapter(accountNumbersListAdapter);
 
         getBalanceButton.setOnClickListener(new View.OnClickListener() {
@@ -90,6 +94,47 @@ public class MainActivity extends ActionBarActivity {
                 balanceText.setText("getting balance...");
                 String query = "paul;paulx;4;" + GET_BALANCE_OPERATION + ";-1"; // get from Settings
                 new QueryTask(balanceText).execute(GET_BALANCE_OPERATION, query);
+            }
+        });
+
+        addAccountButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Add account number");
+
+                final EditText input = new EditText(MainActivity.this);
+                input.setInputType(InputType.TYPE_CLASS_NUMBER);
+                builder.setView(input);
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String newAccount = input.getText().toString();
+
+                        // Update account numbers in SharedPreferences
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                        Set<String> accountNumbersSet = new HashSet<>();
+                        accountNumbers.add(newAccount);
+                        accountNumbersSet.addAll(accountNumbers);
+                        SharedPreferences.Editor prefsEditor = prefs.edit();
+                        prefsEditor.putStringSet(ACCOUNT_NUMBERS_SET, accountNumbersSet);
+                        prefsEditor.apply();
+
+                        // Update the ListView as well
+                        accountNumbersListAdapter.notifyDataSetChanged();
+
+                        // OBS! this is only added locally, doesn't update server DB
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
             }
         });
 
