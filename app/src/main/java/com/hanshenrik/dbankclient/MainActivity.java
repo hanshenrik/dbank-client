@@ -31,6 +31,10 @@ import java.util.Map;
 public class MainActivity extends ActionBarActivity {
 
     private static final int SETTINGS_REQUEST = 1;
+    private static final int GET_BALANCE_OPERATION = 0;
+    private static final int DEPOSIT_OPERATION = 1;
+    private static final int WITHDRAW_OPERATION = 2;
+    private static final int TRANSFER_OPERATION = 3;
 
     private Button getBalanceButton;
     private Button withdrawButton;
@@ -83,7 +87,8 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 balanceText.setText("getting balance...");
-                new QueryTask(balanceText).execute("paul;paulx;4;0;33");
+                String query = "paul;paulx;4;" + GET_BALANCE_OPERATION + ";-1"; // get from Settings
+                new QueryTask(balanceText).execute(GET_BALANCE_OPERATION, query);
             }
         });
 
@@ -136,7 +141,7 @@ public class MainActivity extends ActionBarActivity {
         });
     }
 
-    private class QueryTask extends AsyncTask<String, Void, String> {
+    private class QueryTask extends AsyncTask<Object, Void, String> {
         TextView responseView;
 
         public QueryTask(TextView responseView) {
@@ -149,9 +154,13 @@ public class MainActivity extends ActionBarActivity {
         }
 
         @Override
-        protected String doInBackground(String... messages) {
-            String query = messages[0];
-            String response;
+        protected String doInBackground(Object... params) {
+            int operation = (int) params[0];
+            String query = (String) params[1];
+            double amount;
+            String fromAccount, toAccount;
+
+            String message = "just initializing for DEV"; // TODO: initialize empty or something
             try {
                 Socket socket = new Socket("161.73.147.225", 5108);
                 Log.d("SOC", "socket created");
@@ -159,28 +168,45 @@ public class MainActivity extends ActionBarActivity {
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                 BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-                String message = null;
-                //while ( (message = reader.readLine()) != null ) {
-                message = reader.readLine();
-                Log.d("SOC", message);
-                message = query;
-                Log.d("SOC", "sending: " + message);
-                writer.write(message, 0, message.length());
-                writer.newLine();
-                writer.flush();
-                //}
-                message = reader.readLine();
-                Log.d("SOC", message);
+                switch (operation) {
+                    case GET_BALANCE_OPERATION:
+                        Log.d("SOC", "in GET_BALANCE_OPERATION");
+                        message = reader.readLine();
+                        Log.d("SOC", message);
+                        message = query;
+                        Log.d("SOC", "sending: " + message);
+                        writer.write(message, 0, message.length());
+                        writer.newLine();
+                        writer.flush();
+                        message = reader.readLine();
+                        Log.d("SOC", message);
 
-                writer.close();
-                reader.close();
-                socket.close();
-                response = message;
+                        writer.close();
+                        reader.close();
+                        socket.close();
+                        break;
+                    case DEPOSIT_OPERATION:
+                        Log.d("SOC", "in DEPOSIT_OPERATION");
+                        amount = (double) params[2];
+                        break;
+                    case WITHDRAW_OPERATION:
+                        Log.d("SOC", "in WITHDRAW_OPERATION");
+                        amount = (double) params[2];
+                        break;
+                    case TRANSFER_OPERATION:
+                        Log.d("SOC", "in TRANSFER_OPERATION");
+                        fromAccount = (String) params[3];
+                        toAccount = (String) params[4];
+                        break;
+                    default:
+                        Log.d("SOC", "in switch default");
+                        break;
+                }
             } catch (IOException e) {
                 e.printStackTrace();
-                response = e.toString();
+                message = e.toString();
             }
-            return response;
+            return message;
         }
 
         @Override
@@ -188,7 +214,6 @@ public class MainActivity extends ActionBarActivity {
             responseView.setText(response);
         }
     }
-
 
 
     @Override
