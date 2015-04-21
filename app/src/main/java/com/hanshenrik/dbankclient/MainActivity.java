@@ -87,6 +87,11 @@ public class MainActivity extends ActionBarActivity {
         amountInput = (EditText) findViewById(R.id.amountInput);
         accountNumbersListView = (ListView) findViewById(R.id.accountNumbersListView);
 
+        // Set a title for the list of accounts
+        TextView textView = new TextView(this);
+        textView.setText("Your accounts");
+        accountNumbersListView.addHeaderView(textView);
+
         final ArrayAdapter accountNumbersListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, accountNumbers);
         accountNumbersListView.setAdapter(accountNumbersListAdapter);
 
