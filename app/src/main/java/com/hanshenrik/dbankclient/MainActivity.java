@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -95,6 +96,10 @@ public class MainActivity extends ActionBarActivity {
         depositButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (amountInput.getText().toString().trim().isEmpty()) {
+                    Toast.makeText(getApplicationContext(), "Amount cannot be empty!", Toast.LENGTH_LONG).show();
+                    return;
+                }
                 amount = Double.parseDouble(amountInput.getText().toString());
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle("Deposit?")
@@ -102,8 +107,9 @@ public class MainActivity extends ActionBarActivity {
                                 + "?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                // setup connection
-                                // do stuff
+                                balanceText.setText("depositing money...");
+                                String query = "paul;paulx;4;" + DEPOSIT_OPERATION + ";" + amount; // get from Settings
+                                new QueryTask(balanceText).execute(DEPOSIT_OPERATION, query);
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -119,6 +125,10 @@ public class MainActivity extends ActionBarActivity {
         withdrawButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (amountInput.getText().toString().trim().isEmpty()) {
+                    Toast.makeText(getApplicationContext(), "Amount cannot be empty!", Toast.LENGTH_LONG).show();
+                    return;
+                }
                 amount = Double.parseDouble(amountInput.getText().toString());
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle("Withdraw?")
@@ -126,8 +136,9 @@ public class MainActivity extends ActionBarActivity {
                                 + "?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                // setup connection
-                                // do stuff
+                                balanceText.setText("withdrawing money...");
+                                String query = "paul;paulx;4;" + WITHDRAW_OPERATION + ";" + amount; // get from Settings
+                                new QueryTask(balanceText).execute(WITHDRAW_OPERATION, query);
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -157,8 +168,6 @@ public class MainActivity extends ActionBarActivity {
         protected String doInBackground(Object... params) {
             int operation = (int) params[0];
             String query = (String) params[1];
-            double amount;
-            String fromAccount, toAccount;
 
             String message = "just initializing for DEV"; // TODO: initialize empty or something
             try {
@@ -187,16 +196,12 @@ public class MainActivity extends ActionBarActivity {
                         break;
                     case DEPOSIT_OPERATION:
                         Log.d("SOC", "in DEPOSIT_OPERATION");
-                        amount = (double) params[2];
                         break;
                     case WITHDRAW_OPERATION:
                         Log.d("SOC", "in WITHDRAW_OPERATION");
-                        amount = (double) params[2];
                         break;
                     case TRANSFER_OPERATION:
                         Log.d("SOC", "in TRANSFER_OPERATION");
-                        fromAccount = (String) params[3];
-                        toAccount = (String) params[4];
                         break;
                     default:
                         Log.d("SOC", "in switch default");
