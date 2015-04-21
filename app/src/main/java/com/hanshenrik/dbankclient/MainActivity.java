@@ -29,7 +29,6 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -41,6 +40,7 @@ public class MainActivity extends ActionBarActivity {
     private static final int WITHDRAW_OPERATION = 2;
     private static final int TRANSFER_OPERATION = 3;
     public static final String ACCOUNT_NUMBERS_SET = "com.hanshenrik.dbankclient.account_numbers_list";
+    private static final String SEP = ";";
 
     private Button getBalanceButton, withdrawButton, depositButton, addAccountButton;
     private TextView balanceText;
@@ -50,27 +50,32 @@ public class MainActivity extends ActionBarActivity {
     private ArrayList<String> accountNumbers;
     private String selectedAccount;
     private double amount;
+    private String ip, username, password;
+    private int port;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("1", "");
         if (resultCode == RESULT_CANCELED) { // user clicked back button in SettingsActivity
-            Log.d("2", "");
             if (requestCode == SETTINGS_REQUEST) {
-                Log.d("3", "");
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-                Map<String, ?> prefsMap = prefs.getAll();
-                for (String key : prefsMap.keySet()) {
-                    Log.d("MAP", key + " | " + prefsMap.get(key).toString());
-                }
+                updatePreferences();
             }
         }
+    }
+
+    private void updatePreferences() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        ip = prefs.getString(getString(R.string.pref_key_ip), null);
+        port = Integer.parseInt(prefs.getString(getString(R.string.pref_key_port), null));
+        username = prefs.getString(getString(R.string.pref_key_username), null);
+        password = prefs.getString(getString(R.string.pref_key_password), null);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        updatePreferences();
 
         accountNumbers = new ArrayList<>();
 
@@ -151,8 +156,11 @@ public class MainActivity extends ActionBarActivity {
                     Toast.makeText(getApplicationContext(), "Please select an account!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Log.d("BALANCE", selectedAccount);
-                String query = "john;johnx;" + selectedAccount + ";" + GET_BALANCE_OPERATION + ";-1"; // get from Settings
+                String query =  username + SEP +
+                                password + SEP +
+                                selectedAccount + SEP +
+                                GET_BALANCE_OPERATION + SEP +
+                                amount;
                 new QueryTask(balanceText).execute(query);
             }
         });
@@ -176,7 +184,11 @@ public class MainActivity extends ActionBarActivity {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 balanceText.setText("depositing money...");
-                                String query = "john;johnx;" + selectedAccount + ";" + DEPOSIT_OPERATION + ";" + amount; // get from Settings
+                                String query =  username + SEP +
+                                        password + SEP +
+                                        selectedAccount + SEP +
+                                        DEPOSIT_OPERATION + SEP +
+                                        amount;
                                 new QueryTask(balanceText).execute(query);
                             }
                         })
@@ -209,7 +221,11 @@ public class MainActivity extends ActionBarActivity {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 balanceText.setText("withdrawing money...");
-                                String query = "john;johnx;" + selectedAccount + ";" + WITHDRAW_OPERATION + ";" + amount; // get from Settings
+                                String query =  username + SEP +
+                                        password + SEP +
+                                        selectedAccount + SEP +
+                                        WITHDRAW_OPERATION + SEP +
+                                        amount;
                                 new QueryTask(balanceText).execute(query);
                             }
                         })
@@ -242,7 +258,7 @@ public class MainActivity extends ActionBarActivity {
 
             String message;
             try {
-                Socket socket = new Socket("161.73.147.225", 5108);
+                Socket socket = new Socket(ip, port);
                 Log.d("SOC", "socket created");
 
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
