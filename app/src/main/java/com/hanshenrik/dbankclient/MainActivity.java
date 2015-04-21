@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -17,6 +18,12 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -76,10 +83,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 balanceText.setText("getting balance...");
-                // setup connection
-                // query balance
-                // on some callback
-                balanceText.setText(getString(R.string.currency_prefix) + "100.00");
+                new QueryTask(balanceText).execute("paul;paulx;4;0;33");
             }
         });
 
@@ -131,6 +135,60 @@ public class MainActivity extends ActionBarActivity {
             }
         });
     }
+
+    private class QueryTask extends AsyncTask<String, Void, String> {
+        TextView responseView;
+
+        public QueryTask(TextView responseView) {
+            this.responseView = responseView;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... messages) {
+            String query = messages[0];
+            String response;
+            try {
+                Socket socket = new Socket("161.73.147.225", 5108);
+                Log.d("SOC", "socket created");
+
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+                String message = null;
+                //while ( (message = reader.readLine()) != null ) {
+                message = reader.readLine();
+                Log.d("SOC", message);
+                message = query;
+                Log.d("SOC", "sending: " + message);
+                writer.write(message, 0, message.length());
+                writer.newLine();
+                writer.flush();
+                //}
+                message = reader.readLine();
+                Log.d("SOC", message);
+
+                writer.close();
+                reader.close();
+                socket.close();
+                response = message;
+            } catch (IOException e) {
+                e.printStackTrace();
+                response = e.toString();
+            }
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(String response) {
+            responseView.setText(response);
+        }
+    }
+
 
 
     @Override
