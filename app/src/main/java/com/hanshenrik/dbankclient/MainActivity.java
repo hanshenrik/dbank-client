@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -47,6 +48,7 @@ public class MainActivity extends ActionBarActivity {
     private ListView accountNumbersListView;
 
     private ArrayList<String> accountNumbers;
+    private String selectedAccount;
     private double amount;
 
     @Override
@@ -77,10 +79,10 @@ public class MainActivity extends ActionBarActivity {
         Set<String> accountNumbersSet = prefs.getStringSet(ACCOUNT_NUMBERS_SET, null);
         accountNumbers.addAll(accountNumbersSet);
 
+        addAccountButton = (Button) findViewById(R.id.addAccountButton);
         getBalanceButton = (Button) findViewById(R.id.getBalanceButton);
         withdrawButton = (Button) findViewById(R.id.withdrawButton);
         depositButton = (Button) findViewById(R.id.depositButton);
-        addAccountButton = (Button) findViewById(R.id.addAccountButton);
         balanceText = (TextView) findViewById(R.id.balanceTextView);
         amountInput = (EditText) findViewById(R.id.amountInput);
         accountNumbersListView = (ListView) findViewById(R.id.accountNumbersListView);
@@ -88,53 +90,65 @@ public class MainActivity extends ActionBarActivity {
         final ArrayAdapter accountNumbersListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, accountNumbers);
         accountNumbersListView.setAdapter(accountNumbersListAdapter);
 
-        getBalanceButton.setOnClickListener(new View.OnClickListener() {
+        accountNumbersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-                balanceText.setText("getting balance...");
-                String query = "paul;paulx;4;" + GET_BALANCE_OPERATION + ";-1"; // get from Settings
-                new QueryTask(balanceText).execute(GET_BALANCE_OPERATION, query);
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectedAccount = parent.getItemAtPosition(position).toString();
+                Log.d("LIST", selectedAccount);
             }
         });
 
         addAccountButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("Add account number");
-
                 final EditText input = new EditText(MainActivity.this);
                 input.setInputType(InputType.TYPE_CLASS_NUMBER);
-                builder.setView(input);
 
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String newAccount = input.getText().toString();
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Add account number")
+                        .setView(input)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String newAccount = input.getText().toString();
 
-                        // Update account numbers in SharedPreferences
-                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-                        Set<String> accountNumbersSet = new HashSet<>();
-                        accountNumbers.add(newAccount);
-                        accountNumbersSet.addAll(accountNumbers);
-                        SharedPreferences.Editor prefsEditor = prefs.edit();
-                        prefsEditor.putStringSet(ACCOUNT_NUMBERS_SET, accountNumbersSet);
-                        prefsEditor.apply();
+                                // Update account numbers in SharedPreferences
+                                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                                Set<String> accountNumbersSet = new HashSet<>();
+                                accountNumbers.add(newAccount);
+                                accountNumbersSet.addAll(accountNumbers);
+                                SharedPreferences.Editor prefsEditor = prefs.edit();
+                                prefsEditor.putStringSet(ACCOUNT_NUMBERS_SET, accountNumbersSet);
+                                prefsEditor.apply();
 
-                        // Update the ListView as well
-                        accountNumbersListAdapter.notifyDataSetChanged();
+                                // Update the ListView as well
+                                accountNumbersListAdapter.notifyDataSetChanged();
 
-                        // OBS! this is only added locally, doesn't update server DB
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
+                                // OBS! this is only added locally, doesn't update server DB
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_input_add)
+                        .show();
+            }
+        });
 
-                builder.show();
+        getBalanceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                balanceText.setText("getting balance...");
+                if (accountNumbersListView.getItemAtPosition(accountNumbersListView.getCheckedItemPosition()) == null) {
+                    Toast.makeText(getApplicationContext(), "Please select an account!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Log.d("BALANCE", selectedAccount);
+                String query = "john;johnx;" + selectedAccount + ";" + GET_BALANCE_OPERATION + ";-1"; // get from Settings
+                new QueryTask(balanceText).execute(query);
             }
         });
 
@@ -142,19 +156,23 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 if (amountInput.getText().toString().trim().isEmpty()) {
-                    Toast.makeText(getApplicationContext(), "Amount cannot be empty!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Amount cannot be empty!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (accountNumbersListView.getItemAtPosition(accountNumbersListView.getCheckedItemPosition()) == null) {
+                    Toast.makeText(getApplicationContext(), "Please select an account!", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 amount = Double.parseDouble(amountInput.getText().toString());
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle("Deposit?")
                         .setMessage("Are you sure you want to deposit " + amount + " into account "
-                                + "?")
+                                + selectedAccount + "?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 balanceText.setText("depositing money...");
-                                String query = "paul;paulx;4;" + DEPOSIT_OPERATION + ";" + amount; // get from Settings
-                                new QueryTask(balanceText).execute(DEPOSIT_OPERATION, query);
+                                String query = "john;johnx;" + selectedAccount + ";" + DEPOSIT_OPERATION + ";" + amount; // get from Settings
+                                new QueryTask(balanceText).execute(query);
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -174,16 +192,20 @@ public class MainActivity extends ActionBarActivity {
                     Toast.makeText(getApplicationContext(), "Amount cannot be empty!", Toast.LENGTH_LONG).show();
                     return;
                 }
+                if (selectedAccount == null) {
+                    Toast.makeText(getApplicationContext(), "Please select an account!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 amount = Double.parseDouble(amountInput.getText().toString());
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle("Withdraw?")
                         .setMessage("Are you sure you want to withdraw " + amount + " from account "
-                                + "?")
+                                + selectedAccount + "?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 balanceText.setText("withdrawing money...");
-                                String query = "paul;paulx;4;" + WITHDRAW_OPERATION + ";" + amount; // get from Settings
-                                new QueryTask(balanceText).execute(WITHDRAW_OPERATION, query);
+                                String query = "john;johnx;" + selectedAccount + ";" + WITHDRAW_OPERATION + ";" + amount; // get from Settings
+                                new QueryTask(balanceText).execute(query);
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -197,7 +219,7 @@ public class MainActivity extends ActionBarActivity {
         });
     }
 
-    private class QueryTask extends AsyncTask<Object, Void, String> {
+    private class QueryTask extends AsyncTask<String, Void, String> {
         TextView responseView;
 
         public QueryTask(TextView responseView) {
@@ -210,11 +232,10 @@ public class MainActivity extends ActionBarActivity {
         }
 
         @Override
-        protected String doInBackground(Object... params) {
-            int operation = (int) params[0];
-            String query = (String) params[1];
+        protected String doInBackground(String... params) {
+            String query = params[0];
 
-            String message = "just initializing for DEV"; // TODO: initialize empty or something
+            String message;
             try {
                 Socket socket = new Socket("161.73.147.225", 5108);
                 Log.d("SOC", "socket created");
@@ -222,36 +243,22 @@ public class MainActivity extends ActionBarActivity {
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                 BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-                switch (operation) {
-                    case GET_BALANCE_OPERATION:
-                        Log.d("SOC", "in GET_BALANCE_OPERATION");
-                        message = reader.readLine();
-                        Log.d("SOC", message);
-                        message = query;
-                        Log.d("SOC", "sending: " + message);
-                        writer.write(message, 0, message.length());
-                        writer.newLine();
-                        writer.flush();
-                        message = reader.readLine();
-                        Log.d("SOC", message);
+                // Receive greeting from server
+                message = reader.readLine();
+                Log.d("SOC", message);
 
-                        writer.close();
-                        reader.close();
-                        socket.close();
-                        break;
-                    case DEPOSIT_OPERATION:
-                        Log.d("SOC", "in DEPOSIT_OPERATION");
-                        break;
-                    case WITHDRAW_OPERATION:
-                        Log.d("SOC", "in WITHDRAW_OPERATION");
-                        break;
-                    case TRANSFER_OPERATION:
-                        Log.d("SOC", "in TRANSFER_OPERATION");
-                        break;
-                    default:
-                        Log.d("SOC", "in switch default");
-                        break;
-                }
+                //
+                message = query;
+                Log.d("SOC", "sending: " + message);
+                writer.write(message, 0, message.length());
+                writer.newLine();
+                writer.flush();
+                message = reader.readLine();
+                Log.d("SOC", message);
+
+                writer.close();
+                reader.close();
+                socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
                 message = e.toString();
