@@ -4,7 +4,7 @@
 
     <string name="pref_key_ip">pref_ip</string>
     <string name="pref_title_ip">IP address</string>
-    <string name="pref_default_ip">161.73.250.46</string>
+    <string name="pref_default_ip">161.73.147.225</string>
 
     <string name="pref_key_port">pref_port</string>
     <string name="pref_title_port">Port number</string>
@@ -12,20 +12,19 @@
 
     <string name="pref_key_username">pref_username</string>
     <string name="pref_title_username">Username</string>
-    <string name="pref_default_username">hans</string>
+    <string name="pref_default_username">john</string>
 
     <string name="pref_key_password">pref_password</string>
     <string name="pref_title_password">Password</string>
+    <string name="pref_default_password">johnx</string>
 
     <string name="pref_key_account_numbers">pref_account_numbers</string>
     <string name="pref_title_account_numbers">Account numbers</string>
     <string-array name="pref_account_numbers_list_titles">
         <item>1111.11.11111</item>
         <item>2222.22.22222</item>
-        <item>3333.33.33333</item>
     </string-array>
     <string-array name="pref_account_numbers_list_values">
-        <item>0</item>
         <item>1</item>
         <item>2</item>
     </string-array>
