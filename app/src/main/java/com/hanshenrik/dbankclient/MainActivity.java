@@ -35,10 +35,10 @@ import java.util.Set;
 public class MainActivity extends ActionBarActivity {
 
     private static final int SETTINGS_REQUEST = 1;
-    private static final int GET_BALANCE_OPERATION = 0;
-    private static final int DEPOSIT_OPERATION = 1;
-    private static final int WITHDRAW_OPERATION = 2;
-    private static final int TRANSFER_OPERATION = 3;
+    private static final int GET_BALANCE_OPERATION = 1;
+    private static final int DEPOSIT_OPERATION = 2;
+    private static final int WITHDRAW_OPERATION = 3;
+    private static final int TRANSFER_OPERATION = 4;
     public static final String ACCOUNT_NUMBERS_SET = "com.hanshenrik.dbankclient.account_numbers_list";
     private static final String SEP = ";";
 
