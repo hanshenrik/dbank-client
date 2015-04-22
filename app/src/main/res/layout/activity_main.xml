@@ -65,6 +65,14 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Transfer"
+        android:id="@+id/transferButton"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Deposit"
         android:id="@+id/depositButton"
         android:layout_alignParentBottom="true"
