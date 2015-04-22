@@ -42,7 +42,7 @@ public class MainActivity extends ActionBarActivity {
     public static final String ACCOUNT_NUMBERS_SET = "com.hanshenrik.dbankclient.account_numbers_list";
     private static final String SEP = ";";
 
-    private Button getBalanceButton, withdrawButton, depositButton, addAccountButton;
+    private Button getBalanceButton, withdrawButton, depositButton, addAccountButton, transferButton;
     private TextView balanceText;
     private EditText amountInput;
     private ListView accountNumbersListView;
@@ -88,6 +88,7 @@ public class MainActivity extends ActionBarActivity {
         getBalanceButton = (Button) findViewById(R.id.getBalanceButton);
         withdrawButton = (Button) findViewById(R.id.withdrawButton);
         depositButton = (Button) findViewById(R.id.depositButton);
+        transferButton = (Button) findViewById(R.id.transferButton);
         balanceText = (TextView) findViewById(R.id.balanceTextView);
         amountInput = (EditText) findViewById(R.id.amountInput);
         accountNumbersListView = (ListView) findViewById(R.id.accountNumbersListView);
@@ -151,11 +152,11 @@ public class MainActivity extends ActionBarActivity {
         getBalanceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                balanceText.setText("getting balance...");
                 if (accountNumbersListView.getItemAtPosition(accountNumbersListView.getCheckedItemPosition()) == null) {
                     Toast.makeText(getApplicationContext(), "Please select an account!", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                balanceText.setText("getting balance...");
                 String query =  username + SEP +
                                 password + SEP +
                                 selectedAccount + SEP +
@@ -235,6 +236,49 @@ public class MainActivity extends ActionBarActivity {
                             }
                         })
                         .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
+
+        transferButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (amountInput.getText().toString().trim().isEmpty()) {
+                    Toast.makeText(getApplicationContext(), "Amount cannot be empty!", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                if (selectedAccount == null) {
+                    Toast.makeText(getApplicationContext(), "Please specify sending account!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                amount = Double.parseDouble(amountInput.getText().toString());
+
+                final EditText input = new EditText(MainActivity.this);
+                input.setInputType(InputType.TYPE_CLASS_NUMBER);
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Specify receiving account number:")
+                        .setView(input)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                balanceText.setText("transferring money...");
+                                String toAccount = input.getText().toString().trim();
+                                String query =  username + SEP +
+                                        password + SEP +
+                                        selectedAccount + SEP +
+                                        TRANSFER_OPERATION + SEP +
+                                        amount + SEP +
+                                        toAccount;
+                                new QueryTask(balanceText).execute(query);
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_media_ff)
                         .show();
             }
         });
