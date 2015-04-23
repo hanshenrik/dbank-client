@@ -48,7 +48,7 @@ public class MainActivity extends ActionBarActivity {
     private ListView accountNumbersListView;
 
     private ArrayList<String> accountNumbers;
-    private String selectedAccount;
+    private String selectedAccount, toAccount;
     private double amount;
     private String ip, username, password;
     private int port;
@@ -78,6 +78,8 @@ public class MainActivity extends ActionBarActivity {
         updatePreferences();
 
         accountNumbers = new ArrayList<>();
+        toAccount = "-1";
+        amount = -1;
 
         // Retrieve account numbers
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
@@ -161,7 +163,8 @@ public class MainActivity extends ActionBarActivity {
                                 password + SEP +
                                 selectedAccount + SEP +
                                 GET_BALANCE_OPERATION + SEP +
-                                amount;
+                                amount + SEP +
+                                toAccount;
                 new QueryTask(balanceText).execute(query);
             }
         });
@@ -189,7 +192,8 @@ public class MainActivity extends ActionBarActivity {
                                         password + SEP +
                                         selectedAccount + SEP +
                                         DEPOSIT_OPERATION + SEP +
-                                        amount;
+                                        amount + SEP +
+                                        toAccount;
                                 new QueryTask(balanceText).execute(query);
                             }
                         })
@@ -226,7 +230,8 @@ public class MainActivity extends ActionBarActivity {
                                         password + SEP +
                                         selectedAccount + SEP +
                                         WITHDRAW_OPERATION + SEP +
-                                        amount;
+                                        amount + SEP +
+                                        toAccount;
                                 new QueryTask(balanceText).execute(query);
                             }
                         })
@@ -262,7 +267,7 @@ public class MainActivity extends ActionBarActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 balanceText.setText("transferring money...");
-                                String toAccount = input.getText().toString().trim();
+                                toAccount = input.getText().toString().trim();
                                 String query =  username + SEP +
                                         password + SEP +
                                         selectedAccount + SEP +
