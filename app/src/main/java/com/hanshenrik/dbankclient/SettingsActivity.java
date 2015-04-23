@@ -46,12 +46,11 @@ public class SettingsActivity extends PreferenceActivity {
         EditTextPreference ipAddress = (EditTextPreference) findPreference(getString(R.string.pref_key_ip));
         EditTextPreference portNumber = (EditTextPreference) findPreference(getString(R.string.pref_key_port));
         EditTextPreference username = (EditTextPreference) findPreference(getString(R.string.pref_key_username));
-        EditTextPreference password = (EditTextPreference) findPreference(getString(R.string.pref_key_password));
 
         ipAddress.setSummary(ipAddress.getText());
         portNumber.setSummary(portNumber.getText());
         username.setSummary(username.getText());
-        password.setSummary(password.getText());
+
     }
 
     @Override
