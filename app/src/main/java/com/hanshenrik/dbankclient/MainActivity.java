@@ -41,7 +41,6 @@ public class MainActivity extends ActionBarActivity {
     public static final String ACCOUNT_NUMBERS_SET = "com.hanshenrik.dbankclient.account_numbers_list";
     private static final String SEP = ";";
 
-    private Button getBalanceButton, withdrawButton, depositButton, addAccountButton, transferButton;
     private TextView balanceText;
     private EditText amountInput;
     private ListView accountNumbersListView;
@@ -85,11 +84,11 @@ public class MainActivity extends ActionBarActivity {
         Set<String> accountNumbersSet = prefs.getStringSet(ACCOUNT_NUMBERS_SET, null);
         accountNumbers.addAll(accountNumbersSet);
 
-        addAccountButton = (Button) findViewById(R.id.addAccountButton);
-        getBalanceButton = (Button) findViewById(R.id.getBalanceButton);
-        withdrawButton = (Button) findViewById(R.id.withdrawButton);
-        depositButton = (Button) findViewById(R.id.depositButton);
-        transferButton = (Button) findViewById(R.id.transferButton);
+        Button addAccountButton = (Button) findViewById(R.id.addAccountButton);
+        Button getBalanceButton = (Button) findViewById(R.id.getBalanceButton);
+        Button withdrawButton = (Button) findViewById(R.id.withdrawButton);
+        Button depositButton = (Button) findViewById(R.id.depositButton);
+        Button transferButton = (Button) findViewById(R.id.transferButton);
         balanceText = (TextView) findViewById(R.id.balanceTextView);
         amountInput = (EditText) findViewById(R.id.amountInput);
         accountNumbersListView = (ListView) findViewById(R.id.accountNumbersListView);
@@ -157,12 +156,12 @@ public class MainActivity extends ActionBarActivity {
                     return;
                 }
                 balanceText.setText("getting balance...");
-                String query =  username + SEP +
-                                password + SEP +
-                                selectedAccount + SEP +
-                                GET_BALANCE_OPERATION + SEP +
-                                amount + SEP +
-                                toAccount;
+                String query = username + SEP +
+                        password + SEP +
+                        selectedAccount + SEP +
+                        GET_BALANCE_OPERATION + SEP +
+                        amount + SEP +
+                        toAccount;
                 new QueryTask(balanceText).execute(query);
             }
         });
@@ -186,7 +185,7 @@ public class MainActivity extends ActionBarActivity {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 balanceText.setText("depositing money...");
-                                String query =  username + SEP +
+                                String query = username + SEP +
                                         password + SEP +
                                         selectedAccount + SEP +
                                         DEPOSIT_OPERATION + SEP +
@@ -224,7 +223,7 @@ public class MainActivity extends ActionBarActivity {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 balanceText.setText("withdrawing money...");
-                                String query =  username + SEP +
+                                String query = username + SEP +
                                         password + SEP +
                                         selectedAccount + SEP +
                                         WITHDRAW_OPERATION + SEP +
@@ -266,7 +265,7 @@ public class MainActivity extends ActionBarActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 balanceText.setText("transferring money...");
                                 toAccount = input.getText().toString().trim();
-                                String query =  username + SEP +
+                                String query = username + SEP +
                                         password + SEP +
                                         selectedAccount + SEP +
                                         TRANSFER_OPERATION + SEP +
