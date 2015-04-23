@@ -9,7 +9,6 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,7 +40,7 @@ public class MainActivity extends ActionBarActivity {
     private static final int TRANSFER_OPERATION = 4;
     public static final String ACCOUNT_NUMBERS_SET = "com.hanshenrik.dbankclient.account_numbers_list";
     public static final String DBANK_PREFERENCES = "com.hanshenrik.dbankclient.dbank-preferences";
-    public static final String KEY = "e698k1Md6i8bgBSs0o2cDfJO77F8F02T";
+    public static final String KEY = "ThisIsAnUnsafeKeyButNonthelessAKey";
 
     private static final String SEP = ";";
 

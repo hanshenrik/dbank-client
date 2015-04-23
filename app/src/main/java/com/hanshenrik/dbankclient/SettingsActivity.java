@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.view.MenuItem;
@@ -43,14 +44,53 @@ public class SettingsActivity extends PreferenceActivity {
         // Add 'general' preferences.
         addPreferencesFromResource(R.xml.pref_general);
 
-        EditTextPreference ipAddress = (EditTextPreference) findPreference(getString(R.string.pref_key_ip));
-        EditTextPreference portNumber = (EditTextPreference) findPreference(getString(R.string.pref_key_port));
-        EditTextPreference username = (EditTextPreference) findPreference(getString(R.string.pref_key_username));
+        final SecurePreferences preferences = new SecurePreferences(getBaseContext(),
+                MainActivity.DBANK_PREFERENCES, MainActivity.KEY, true);
 
-        ipAddress.setSummary(ipAddress.getText());
-        portNumber.setSummary(portNumber.getText());
-        username.setSummary(username.getText());
+        final EditTextPreference ipAddress = (EditTextPreference) findPreference(getString(R.string.pref_key_ip));
+        final EditTextPreference portNumber = (EditTextPreference) findPreference(getString(R.string.pref_key_port));
+        final EditTextPreference username = (EditTextPreference) findPreference(getString(R.string.pref_key_username));
+        final EditTextPreference password = (EditTextPreference) findPreference(getString(R.string.pref_key_password));
 
+        ipAddress.setSummary(preferences.getString(getString(R.string.pref_key_ip)));
+        portNumber.setSummary(preferences.getString(getString(R.string.pref_key_port)));
+        username.setSummary(preferences.getString(getString(R.string.pref_key_username)));
+        password.setText(preferences.getString(getString(R.string.pref_key_password)));
+
+        ipAddress.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                ipAddress.setSummary((String) newValue);
+                preferences.put(getString(R.string.pref_key_ip), (String) newValue);
+                return false;
+            }
+        });
+
+        portNumber.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                portNumber.setSummary((String) newValue);
+                preferences.put(getString(R.string.pref_key_port), (String) newValue);
+                return false;
+            }
+        });
+
+        username.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                username.setSummary((String) newValue);
+                preferences.put(getString(R.string.pref_key_username), (String) newValue);
+                return false;
+            }
+        });
+
+        password.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                preferences.put(getString(R.string.pref_key_password), (String) newValue);
+                return false;
+            }
+        });
     }
 
     @Override
