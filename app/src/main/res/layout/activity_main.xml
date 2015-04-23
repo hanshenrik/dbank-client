@@ -8,7 +8,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Get Balance"
+        android:text="@string/get_balance"
         android:id="@+id/getBalanceButton"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
@@ -17,7 +17,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Accounts"
+        android:text="@string/add_account"
         android:id="@+id/addAccountButton"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
@@ -26,7 +26,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Balance"
+        android:text="@string/feedback"
         android:id="@+id/balanceTextView"
         android:layout_below="@+id/getBalanceButton"
         android:layout_centerHorizontal="true"
@@ -56,7 +56,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Withdraw"
+        android:text="@string/withdraw"
         android:id="@+id/withdrawButton"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
@@ -65,7 +65,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Transfer"
+        android:text="@string/transfer"
         android:id="@+id/transferButton"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
@@ -73,7 +73,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Deposit"
+        android:text="@string/deposit"
         android:id="@+id/depositButton"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
