@@ -36,6 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="numberDecimal"
+        android:hint="@string/amount_hint"
         android:ems="10"
         android:id="@+id/amountInput"
         android:layout_below="@+id/balanceTextView"

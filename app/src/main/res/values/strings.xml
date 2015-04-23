@@ -8,6 +8,7 @@
     <string name="get_balance">Get Balance</string>
     <string name="add_account">Add Account</string>
     <string name="feedback">Query the bank!</string>
+    <string name="amount_hint">Amount</string>
     <string name="withdraw">Withdraw</string>
     <string name="transfer">Transfer</string>
     <string name="deposit">Deposit</string>
