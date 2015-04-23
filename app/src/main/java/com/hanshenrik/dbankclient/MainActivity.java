@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,6 +40,9 @@ public class MainActivity extends ActionBarActivity {
     private static final int WITHDRAW_OPERATION = 3;
     private static final int TRANSFER_OPERATION = 4;
     public static final String ACCOUNT_NUMBERS_SET = "com.hanshenrik.dbankclient.account_numbers_list";
+    public static final String DBANK_PREFERENCES = "com.hanshenrik.dbankclient.dbank-preferences";
+    public static final String KEY = "e698k1Md6i8bgBSs0o2cDfJO77F8F02T";
+
     private static final String SEP = ";";
 
     private TextView balanceText;
@@ -61,11 +65,11 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void updatePreferences() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        ip = prefs.getString(getString(R.string.pref_key_ip), null);
-        port = Integer.parseInt(prefs.getString(getString(R.string.pref_key_port), null));
-        username = prefs.getString(getString(R.string.pref_key_username), null);
-        password = prefs.getString(getString(R.string.pref_key_password), null);
+        SecurePreferences preferences = new SecurePreferences(getBaseContext(), DBANK_PREFERENCES, KEY, true);
+        ip = preferences.getString(getString(R.string.pref_key_ip));
+        port = Integer.parseInt(preferences.getString(getString(R.string.pref_key_port)));
+        username = preferences.getString(getString(R.string.pref_key_username));
+        password = preferences.getString(getString(R.string.pref_key_password));
     }
 
     @Override
