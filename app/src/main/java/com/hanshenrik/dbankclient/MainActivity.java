@@ -9,7 +9,6 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -107,7 +106,6 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 selectedAccount = parent.getItemAtPosition(position).toString();
-                Log.d("LIST", selectedAccount);
             }
         });
 
@@ -308,23 +306,19 @@ public class MainActivity extends ActionBarActivity {
             String message;
             try {
                 Socket socket = new Socket(ip, port);
-                Log.d("SOC", "socket created");
 
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                 BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
                 // Receive greeting from server
                 message = reader.readLine();
-                Log.d("SOC", message);
 
-                //
+                // Send the query
                 message = query;
-                Log.d("SOC", "sending: " + message);
                 writer.write(message, 0, message.length());
                 writer.newLine();
                 writer.flush();
                 message = reader.readLine();
-                Log.d("SOC", message);
 
                 writer.close();
                 reader.close();
